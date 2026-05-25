@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caixa — Studio Seiko</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d0f14;
+  --bg2:#13161f;
+  --bg3:#1a1e2a;
+  --bg4:#20253a;
+  --border:#ffffff12;
+  --border2:#ffffff1e;
+  --text:#eef0f6;
+  --text2:#7a84a0;
+  --text3:#3e4660;
+  --green:#00d48a;
+  --green-bg:rgba(0,212,138,.10);
+  --green-border:rgba(0,212,138,.22);
+  --red:#ff4c6a;
+  --red-bg:rgba(255,76,106,.10);
+  --red-border:rgba(255,76,106,.22);
+  --r:14px;
+  --r2:10px;
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1.25rem 1rem 3rem;}
+
+/* SALDO */
+.saldo-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem 1.25rem 1.25rem;margin-bottom:1.25rem;}
+.saldo-label{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.35rem;}
+.saldo-num{font-size:2.4rem;font-weight:700;letter-spacing:-.04em;line-height:1;transition:color .35s;}
+.saldo-num.pos{color:var(--green);}
+.saldo-num.neg{color:var(--red);}
+.saldo-pills{display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap;}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:20px;font-size:13px;font-weight:600;}
+.pill.in{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.pill.out{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+.pill svg{width:13px;height:13px;}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:520px){.grid{grid-template-columns:1fr;}}
+
+/* COL */
+.col-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.6rem;display:flex;align-items:center;gap:6px;}
+.col-title.in{color:var(--green);}
+.col-title.out{color:var(--red);}
+.col-title svg{width:14px;height:14px;}
+
+/* FORM */
+.form-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:.6rem;}
+.form-row{display:flex;gap:7px;margin-bottom:7px;}
+.form-row:last-child{margin-bottom:0;}
+input[type=text],input[type=number],input[type=date]{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);
+  padding:9px 11px;font-family:inherit;font-size:13px;color:var(--text);outline:none;width:100%;
+}
+input::placeholder{color:var(--text3);}
+input:focus{border-color:var(--border2);box-shadow:0 0 0 3px rgba(255,255,255,.04);}
+input[type=date]{color-scheme:dark;flex:0 0 auto;width:134px;}
+input[type=number]{width:108px;flex:0 0 auto;}
+
+/* BUTTONS */
+.btn{width:100%;border:none;border-radius:var(--r2);padding:10px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:filter .15s,transform .1s;}
+.btn:active{transform:scale(.97);}
+.btn:hover{filter:brightness(1.12);}
+.btn.in{background:var(--green);color:#031a11;}
+.btn.out{background:var(--red);color:#1a0009;}
+
+/* ITEMS */
+.item-list{display:flex;flex-direction:column;gap:6px;}
+.item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;animation:up .2s ease;}
+@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.item-top{display:flex;align-items:center;gap:8px;}
+.item-name{font-size:13px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-val{font-size:14px;font-weight:700;flex-shrink:0;}
+.item-val.in{color:var(--green);}
+.item-val.out{color:var(--red);}
+.item-date{font-size:11px;color:var(--text2);margin-top:4px;}
+.del{background:none;border:none;color:var(--text3);cursor:pointer;padding:3px;border-radius:5px;line-height:1;font-size:15px;flex-shrink:0;}
+.del:hover{color:var(--red);background:var(--red-bg);}
+.empty{font-size:12px;color:var(--text3);text-align:center;padding:14px 0;}
+
+/* PULSE */
+.pulse{animation:pulseA .3s ease;}
+@keyframes pulseA{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+</style>
+</head>
+<body>
+
+<!-- SALDO -->
+<div class="saldo-card">
+  <div class="saldo-label">💰 Saldo disponível</div>
+  <div class="saldo-num pos" id="saldo">R$ 0,00</div>
+  <div class="saldo-pills">
+    <div class="pill in">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      Entrou: <span id="totIn">R$ 0,00</span>
+    </div>
+    <div class="pill out">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      Saiu: <span id="totOut">R$ 0,00</span>
+    </div>
+  </div>
+</div>
+
+<!-- COLUNAS -->
+<div class="grid">
+
+  <!-- ENTRADAS -->
+  <div>
+    <div class="col-title in">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      Entradas
+    </div>
+
+    <div class="form-box">
+      <div class="form-row">
+        <input type="text" id="inNome" placeholder="Nome (ex: Cred Amigo)" maxlength="30">
+      </div>
+      <div class="form-row">
+        <input type="number" id="inValor" placeholder="Valor R$" min="0" step="0.01">
+        <input type="date" id="inData">
+      </div>
+      <div class="form-row">
+        <button class="btn in" onclick="add('in')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
+          Registrar entrada
+        </button>
+      </div>
+    </div>
+
+    <div class="item-list" id="listIn">
+      <div class="empty">Nenhuma entrada</div>
+    </div>
+  </div>
+
+  <!-- SAÍDAS -->
+  <div>
+    <div class="col-title out">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      Saídas
+    </div>
+
+    <div class="form-box">
+      <div class="form-row">
+        <input type="text" id="outNome" placeholder="Nome (ex: Carro de Som)" maxlength="30">
+      </div>
+      <div class="form-row">
+        <input type="number" id="outValor" placeholder="Valor R$" min="0" step="0.01">
+        <input type="date" id="outData">
+      </div>
+      <div class="form-row">
+        <button class="btn out" onclick="add('out')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
+          Registrar saída
+        </button>
+      </div>
+    </div>
+
+    <div class="item-list" id="listOut">
+      <div class="empty">Nenhuma saída</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let db = JSON.parse(localStorage.getItem('seiko_caixa') || '{"in":[],"out":[]}');
+
+const brl = v => 'R$ ' + parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const uid = () => Date.now()+'_'+Math.random().toString(36).slice(2,5);
+const save = () => { try{localStorage.setItem('seiko_caixa',JSON.stringify(db));}catch(e){} };
+const fmtDate = d => { if(!d)return''; const[y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; };
+
+function add(t) {
+  const nome = document.getElementById(t+'Nome').value.trim();
+  const valor = parseFloat(document.getElementById(t+'Valor').value);
+  const data  = document.getElementById(t+'Data').value;
+  if(!nome || isNaN(valor) || valor<=0) {
+    const el = document.getElementById(t+'Nome');
+    el.style.borderColor='var(--red)';
+    setTimeout(()=>el.style.borderColor='',900);
+    return;
+  }
+  db[t].push({id:uid(),nome,valor,data});
+  save();
+  document.getElementById(t+'Nome').value='';
+  document.getElementById(t+'Valor').value='';
+  render();
+}
+
+function remove(t,id) {
+  db[t]=db[t].filter(i=>i.id!==id);
+  save(); render();
+}
+
+function render() {
+  ['in','out'].forEach(t => {
+    const el = document.getElementById('list'+t[0].toUpperCase()+t.slice(1));
+    if(!db[t].length){ el.innerHTML='<div class="empty">Nenhum item</div>'; return; }
+    el.innerHTML = db[t].map(i=>`
+      <div class="item">
+        <div class="item-top">
+          <span class="item-name">${i.nome}</span>
+          <span class="item-val ${t}">${t==='in'?'+':'-'}${brl(i.valor)}</span>
+          <button class="del" onclick="remove('${t}','${i.id}')" title="Remover">✕</button>
+        </div>
+        ${i.data?`<div class="item-date">📅 ${fmtDate(i.data)}</div>`:''}
+      </div>`).join('');
+  });
+  const totIn  = db['in'].reduce((s,i)=>s+i.valor,0);
+  const totOut = db['out'].reduce((s,i)=>s+i.valor,0);
+  const saldo  = totIn - totOut;
+  document.getElementById('totIn').textContent  = brl(totIn);
+  document.getElementById('totOut').textContent = brl(totOut);
+  const el = document.getElementById('saldo');
+  el.textContent = brl(saldo);
+  el.className = 'saldo-num '+(saldo>=0?'pos':'neg');
+  el.classList.add('pulse');
+  setTimeout(()=>el.classList.remove('pulse'),350);
+}
+
+const hoje = new Date().toISOString().split('T')[0];
+document.getElementById('inData').value = hoje;
+document.getElementById('outData').value = hoje;
+['inNome','outNome'].forEach(id=>{
+  document.getElementById(id).addEventListener('keydown',e=>{
+    if(e.key==='Enter') add(id.startsWith('in')?'in':'out');
+  });
+});
+
+render();
+</script>
+</body>
+</html>
